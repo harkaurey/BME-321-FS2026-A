@@ -1,0 +1,14 @@
+# RStudio defaults
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Added manually
+_admin/
+output/
+*.Rproj
+
+# Quarto defaults
+/.quarto/
+**/*.quarto_ipynb
