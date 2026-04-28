@@ -64,6 +64,8 @@ It's always a good idea to get to know your data, both by exploring them numeric
 
 ### Nummerically
 
+In @tbl-explore-data we see descriptive statistics for the variables of interest.
+
 ```{r}
 #| label: tbl-explore-data
 #| tbl-cap: "Descriptive statistics for the variables of interest"
