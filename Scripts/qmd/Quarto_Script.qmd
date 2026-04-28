@@ -81,8 +81,30 @@ kable(sum_stats, digits= 1)
 ### Graphically
 
 ```{r}
+#| label: fig-graphs-1
+#| fig-cap: "Overview of relationships within variables"
+#| echo: false 
 
+ggpairs(BP, aes(col= treatment_group, alpha= .4))
 ```
+
+```{r}
+#| label: fig-clear-answer
+#| fig-cap: "good graph"
+#| echo: false 
+#this can answer our research question more precisely 
+ggarrange(
+    ggplot(BP, aes(treatment_group, reduction_sbp)) +
+      geom_point(aes(col= treatment_group), size= 3, alpha= .4,
+                 position= position_jitter(height= 0, width= .3))+
+      geom_boxplot(fill= NA, outliers= F),
+    ggplot(BP, aes(treatment_group, baseline_sbp)) +
+      geom_point(aes(col= treatment_group), size= 3, alpha= .4) +
+      geom_boxplot(fill= NA, outliers= F),
+    ncol= 2, nrow= 1, common.legend= T)
+```
+
+In @fig-clear-answer we see that both new drug (AH27) and standard care are equally good. But we see that baseline_sbp was slightly higher for standard care. If are hypothesises of higher baseline_sbp leads to higher reduction is true than we can not inteprete that both therapies are equally good. We will have to fit some models and compare them prior concluding something here 😉!
 
 ## Fit model
 
