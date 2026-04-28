@@ -22,23 +22,71 @@ execute:
   freeze: false
 ---
 
-## Quarto
+## Prepare Session
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Load the required libraries, import, screen and correct the data.
 
 ```{r}
-1 + 1
+#| label: prepare session 
+#| echo: false 
+#| output: false 
+
+  library(pastecs)
+  library(ggplot2)
+  library(ggpubr); theme_set(theme_bw())
+  library(GGally)
+  library(performance)
+  library(MuMIn)
+  library(ggeffects)
+  library(tidyverse)
+  library(broom)
+  library(car)
+
+  library(knitr)                                     # To render tables
+
+# Import data
+  BP <- read.csv("data/processed/hyper-tension.csv", stringsAsFactors= T) 
+
+  
+str(BP) # shows data typ and preview of the columns
+summary(BP) #numeric → mean, min, max, etc.+ factors → counts per category
 ```
 
-You can add options to executable code like this
+## Explore the data
+
+```{r}
+
+```
+
+### Nummerically
 
 ```{r}
 #| echo: false
 2 * 2
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### Graphically
+
+```{r}
+
+```
+
+## Fit model
+
+### Formulate and compare
+
+```{r}
+
+```
+
+### Validate the preferred model
+
+```{r}
+
+```
+
+## Interpret model
+
+```{r}
+
+```
