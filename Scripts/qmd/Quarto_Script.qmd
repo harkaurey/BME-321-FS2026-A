@@ -104,15 +104,14 @@ ggarrange(
     ncol= 2, nrow= 1, common.legend= T)
 ```
 
-In @fig-clear-answer we see that both new drug (AH27) and standard care are equally good. But we see that baseline_sbp was slightly higher for standard care. If are hypothesises of higher baseline_sbp leads to higher reduction is true than we can not inteprete that both therapies are equally good. We will have to fit some models and compare them prior concluding something here 😉!
+In @fig-clear-answer we see that both new drug (AH27) and standard care are equally good in reduction of systolic blood pressure. But we see that baseline_sbp was slightly higher for standard care. If are hypothesises of higher baseline_sbp leads to higher reduction is true than we can not inteprete that both therapies are equally good. We will have to fit some models and compare them prior concluding something here !
 
 ## Fit model
 
 ### Formulate and compare
 
 ```{r}
-#| label:  tbl-fit-models
-#| tbl-cap: !expr paste("I choose model 12 becuase it has the lowest AIC", "(AIC=" , AIC))
+#| label:  fit-models
 #| output: false 
 
 #fit models
@@ -129,14 +128,15 @@ model.08 <- lm(reduction_sbp ~ baseline_sbp * treatment_group, data = BP)
 model.09  <- lm(reduction_sbp ~ sex * treatment_group, data = BP)
 model.10 <-  lm(reduction_sbp ~ age * sex, data = BP)
 model.11 <- lm(reduction_sbp ~ treatment_group * age, data = BP)
-model.12 <- lm(reduction_sbp ~ treatment_group +age +sex + baseline_sbp, data = BP)
+model.12 <- lm(reduction_sbp ~ treatment_group + age + sex + baseline_sbp, data = BP)
 
-kable(compare_performance(model.00, model.01, model.02, model.03, model.04, model.05, model.06,model.07, model.08, model.09, model.10, model.11, model.12 ), digits= 3)
+kable(compare.performance(model.00, model.01, model.02, model.03, model.04, model.05, model.06,model.07, model.08, model.09, model.10, model.11, model.12 ), digits= 3)
 
-AIC <- AIC(model.12)
-
+AIC <- AIC(model.12) 
 # 1088.547 lowest AIC of model.12 
 ```
+
+I choose model.12 because it has the lowest AIC= 1088.55 , which tells us that its the best model to work with for intepretating results.
 
 ### Validate the preferred model
 
@@ -147,11 +147,6 @@ AIC <- AIC(model.12)
 # First thing: check overdispersion for *lm functions* and glm!!!
   check_model(model.12) 
 
-
-
-
-
-
 ```
 
 In @fig-diagnostic-plots we see the model represents the reality very well. Homogneity of Variance doesn't look so nice, it points out towards heteroscedasticity meaning that standard errors might be unreliable. The normality of residuals and collinearity look of the model fine though.
@@ -159,5 +154,93 @@ In @fig-diagnostic-plots we see the model represents the reality very well. Homo
 ## Interpret model
 
 ```{r}
+#| label: fig-interpret-objects
+#| fig-cap: "effectiveness of the treatments"
+#| echo: false 
 
+
+## Coefficients, SE, z and p -----
+  coef.table<- round(summary(model.12)$coefficients, 3)
+
+## Approximate R2 ----- amount of variablity explained by your model
+  r.2<- round(attributes(r.squaredLR(model.12))$adj.r.squared, 3)  
+
+## Compare performance to null-model ----- stored the anova of glm.00 and gln.02 in null.chi - - in quarto you extract number from model and store them in objects/names like null.chi
+  null.chi<- anova(model.12, model.00)
+
+# Objects to plot predictions -----------------------------------------------
+
+## Interaction plot -----
+  # Create vector of values for x-axis (to get smooth lines) 
+  t.vec<- seq(min(BP$baseline_sbp), max(BP$baseline_sbp), length.out= 100)
+  
+  # Calculate min, mean max for colour coding of spice at min, mean, max
+  #summary(BP$age)       # The min, mean and max need to be entered by
+                            # hand in the predict_response() function below!!!!
+  
+  # Create predictions dataframe
+  pred.int<- predict_response(model.12,
+                              c("baseline_sbp [t.vec]",
+                                "age [43, 55, 67]"))
+  # Assign text labels to the th groups
+  levels(pred.int$group)<- c("young", "midage", "old")
+  
+  # Create plot - created a plot which is stored under the name pred.plot 
+ pred.plot <- ggplot(pred.int, aes(x, predicted)) +
+  
+  # actual data
+  geom_point(data = BP,
+             aes(baseline_sbp, reduction_sbp, col = treatment_group),
+             alpha = 0.4) +
+  
+  # confidence bands
+  geom_ribbon(aes(ymin = conf.low,
+                  ymax = conf.high,
+                  fill = group),
+              alpha = 0.2) +
+  
+  # prediction lines
+  geom_line(aes(col = group), linewidth = 1) +
+  
+  labs(
+    x = "baseline systolic\n blood pressure (mmHg)",
+    y = "reduction of systolic\n blood pressure (mmHg)",
+    col = "Age",
+    fill = "Age"
+  ) +
+  
+  theme_minimal()
+
+```
+
+```{r}
+#| label: tbl-glm 
+#| tbl-cap:  !expr paste("Estimates, associated standard errors and statistical significance of the parameters estimated by a LM.", "($R^2$=", r.2, ", $\\chi^2_{(", null.chi[2, 3], ",", null.chi[2, 1], ")}$=", round(null.chi[2,4], 3), ", $p$", format.pval(null.chi[2, 5], eps = 0.001), ")") 
+#| echo: false 
+
+# Create table
+kable(coef.table)
+```
+
+A Linear Model with all predictors of the data (*R*^2^= `r r.2` , `r paste("$\\chi^2_{(", null.chi[2,3], ",", null.chi[2,1], ")}$")`= `r round(null.chi[2, 4], 3)` , *p*`r format.pval(null.chi[2, 5], eps= 0.001)`; @tbl-glm) performed significantly better than a null-model, comprising an intercept only. We can see that there is a small sex response difference but it is not significant: $\beta_{age}$= `r round(coef.table[4, 1], 3)` , *SE*= `r round(coef.table[4, 2], 3)` , *z*= `r round(coef.table[4, 3], 3)`, *p*= `r round(coef.table[4,  4], 3)`.
+
+This findings is corroborated by @fig-predict, in which we see that, that older patients have reduced reponse to treatment irrespective of the drug type. We also see that the new drug is slightly better than the standardcare therapy.
+
+```{r}
+#| label: fig-predict
+#| fig-cap: "Raw data and model predictions to visualize the relationship baseline systelic blood pressure and recution of it after giving treatment depending on age and sex"
+#| echo: false 
+
+# Plot predictions
+  pred.plot
+#summary(model.12)
+```
+
+```{r}
+#| label: store session
+#| echo: false 
+#| output: false 
+
+#do it in the end 
+# version<- sessionInfo() #for reproducibility
 ```
