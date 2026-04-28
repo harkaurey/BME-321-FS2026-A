@@ -141,8 +141,20 @@ AIC <- AIC(model.12)
 ### Validate the preferred model
 
 ```{r}
+#| label: fig-diagnostic-plots
+#| fig-cap: "Model diagnostics: these look pretty good "
+
+# First thing: check overdispersion for *lm functions* and glm!!!
+  check_model(model.12) 
+
+
+
+
+
 
 ```
+
+In @fig-diagnostic-plots we see the model represents the reality very well. Homogneity of Variance doesn't look so nice, it points out towards heteroscedasticity meaning that standard errors might be unreliable. The normality of residuals and collinearity look of the model fine though.
 
 ## Interpret model
 
