@@ -130,13 +130,13 @@ model.10 <-  lm(reduction_sbp ~ age * sex, data = BP)
 model.11 <- lm(reduction_sbp ~ treatment_group * age, data = BP)
 model.12 <- lm(reduction_sbp ~ treatment_group + age + sex + baseline_sbp, data = BP)
 
-kable(compare.performance(model.00, model.01, model.02, model.03, model.04, model.05, model.06,model.07, model.08, model.09, model.10, model.11, model.12 ), digits= 3)
+kable(compare_performance(model.00, model.01, model.02, model.03, model.04, model.05, model.06,model.07, model.08, model.09, model.10, model.11, model.12 ), digits= 3)
 
 AIC <- AIC(model.12) 
 # 1088.547 lowest AIC of model.12 
 ```
 
-I choose model.12 because it has the lowest AIC= 1088.55 , which tells us that its the best model to work with for intepretating results.
+I choose model.12 because it has the lowest AIC= 1088.55 , which tells us that its the best model to work with for interpretating results.
 
 ### Validate the preferred model
 
@@ -242,5 +242,5 @@ This findings is corroborated by @fig-predict, in which we see that, that older 
 #| output: false 
 
 #do it in the end 
-# version<- sessionInfo() #for reproducibility
+version<- sessionInfo() #for reproducibility
 ```
