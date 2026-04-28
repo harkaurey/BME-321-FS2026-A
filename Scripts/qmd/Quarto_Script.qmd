@@ -111,7 +111,31 @@ In @fig-clear-answer we see that both new drug (AH27) and standard care are equa
 ### Formulate and compare
 
 ```{r}
+#| label:  tbl-fit-models
+#| tbl-cap: !expr paste("I choose model 12 becuase it has the lowest AIC", "(AIC=" , AIC))
+#| output: false 
 
+#fit models
+
+model.00 <- lm(reduction_sbp ~ 1, data = BP) # ~1 indicates with intercept 
+model.01 <- lm(reduction_sbp ~ baseline_sbp, data = BP)
+model.02 <- lm(reduction_sbp ~ treatment_group, data = BP)
+model.03 <- lm(reduction_sbp ~ age, data = BP)
+model.04 <- lm(reduction_sbp ~ sex, data = BP)
+model.05 <- lm(reduction_sbp ~ sex + treatment_group, data = BP)
+model.06 <-  lm(reduction_sbp ~ age + sex, data = BP)
+model.07 <- lm(reduction_sbp ~ treatment_group + age, data = BP)
+model.08 <- lm(reduction_sbp ~ baseline_sbp * treatment_group, data = BP)
+model.09  <- lm(reduction_sbp ~ sex * treatment_group, data = BP)
+model.10 <-  lm(reduction_sbp ~ age * sex, data = BP)
+model.11 <- lm(reduction_sbp ~ treatment_group * age, data = BP)
+model.12 <- lm(reduction_sbp ~ treatment_group +age +sex + baseline_sbp, data = BP)
+
+kable(compare_performance(model.00, model.01, model.02, model.03, model.04, model.05, model.06,model.07, model.08, model.09, model.10, model.11, model.12 ), digits= 3)
+
+AIC <- AIC(model.12)
+
+# 1088.547 lowest AIC of model.12 
 ```
 
 ### Validate the preferred model
