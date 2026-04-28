@@ -54,15 +54,26 @@ summary(BP) #numeric → mean, min, max, etc.+ factors → counts per category
 
 ## Explore the data
 
-```{r}
+It's always a good idea to get to know your data, both by exploring them numerically and graphically. Variables in dataset:
 
-```
+-   reduction_sbp (outcome) meassures the reduction of systolic blood pressure in mmHg
+
+-   basline_sbp meassure the baselne systloic blood pressure in mmHg
+
+-   treatment_group shows if the patient received new drug or standard therapy for 8 weeks
 
 ### Nummerically
 
 ```{r}
+#| label: tbl-explore-data
+#| tbl-cap: "Descriptive statistics for the variables of interest"
 #| echo: false
-2 * 2
+
+sum_stats<-
+   stat.desc(BP[, c("baseline_sbp", "reduction_sbp")], norm= T)
+ 
+kable(sum_stats, digits= 1)
+
 ```
 
 ### Graphically
